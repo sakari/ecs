@@ -1,0 +1,51 @@
+{
+  "name": "ecs",
+  "version": "0.0.1",
+  "license": "MIT",
+  "description": "entity component system",
+  "private": false,
+  "author": "sakari",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "scripts": {
+    "test": "yarn jest",
+    "build": "yarn tsc && yarn test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sakari/ecs.git"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "typescript": "^3.9.5",
+    "@types/jest": "26.0.15",
+    "@types/lodash": "4.14.164",
+    "@types/node": "13.13.16",
+    "@typescript-eslint/eslint-plugin": "4.6.0",
+    "@typescript-eslint/parser": "4.6.0",
+    "eslint": "7.12.1",
+    "eslint-config-prettier": "6.15.0",
+    "eslint-plugin-import": "2.22.1",
+    "eslint-plugin-jest": "24.1.0",
+    "eslint-plugin-prettier": "3.1.4",
+    "jest": "26.6.1",
+    "prettier": "2.1.2",
+    "ts-jest": "26.4.3",
+    "ts-node": "9.0.0",
+    "typescript": "4.0.5"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testRegex": "test/.*\\.spec.ts$",
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "jsx",
+      "ts",
+      "tsx"
+    ],
+    "preset": "ts-jest",
+    "testMatch": null
+  }
+}
