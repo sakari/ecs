@@ -15,10 +15,8 @@
     "type": "git",
     "url": "https://github.com/sakari/ecs.git"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
-    "typescript": "^3.9.5",
     "@types/jest": "26.0.15",
     "@types/lodash": "4.14.164",
     "@types/node": "13.13.16",
@@ -33,7 +31,7 @@
     "prettier": "2.1.2",
     "ts-jest": "26.4.3",
     "ts-node": "9.0.0",
-    "typescript": "4.0.5"
+    "typescript": "^4.2.3"
   },
   "jest": {
     "testEnvironment": "node",
