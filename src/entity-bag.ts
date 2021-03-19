@@ -21,6 +21,10 @@ export class EntityBag<
   byTag<Tag extends keyof Tags>(
     tag: Tag
   ): readonly entity.EntityComponents<Registry, Tags[Tag]>[] {
+    const entities = this.entities[tag as any];
+    if (!entities) {
+      return [];
+    }
     return this.entities[tag as any] as any;
   }
 
@@ -33,18 +37,18 @@ export class EntityBag<
     }
   }
 
-  add(entity: entity.EntityComponents<Registry, keyof Registry>) {
+  add(entity: entity.AnyEntityComponents<Registry, keyof Registry>) {
     for (const tag in this.tags) {
       const components = Object.keys(entity);
       let skip = false;
-      for (const component in this.tags[tag].values()) {
-        if (components.indexOf(component) < 0) {
+      for (const component of this.tags[tag]) {
+        if (components.indexOf(component as string) < 0) {
           skip = true;
           break;
         }
       }
       if (!skip) {
-        this.entities[tag]!.push(entity);
+        this.entities[tag]!.push(entity as any);
       }
     }
   }

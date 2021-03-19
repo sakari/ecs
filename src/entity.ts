@@ -6,6 +6,10 @@ export interface Component<Props> {
   props: Props;
 }
 
+export type AnyEntityComponents<Registry, Components extends keyof Registry> = {
+  id: EntityId;
+} & { [P in Components]?: Registry[P] };
+
 export type EntityComponents<Registry, Components extends keyof Registry> = {
   id: EntityId;
 } & { [P in Components]: Registry[P] };
