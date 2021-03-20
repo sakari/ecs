@@ -1,5 +1,5 @@
-import * as entity from "../src/entity";
-import * as entitybag from "../src/entity-bag";
+import * as entity from "../src/engine/entity";
+import * as entitybag from "../src/engine/entity-bag";
 
 interface Registry {
   position: entity.PositionComponent;
