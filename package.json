@@ -1,5 +1,5 @@
 {
-  "name": "ecs",
+  "name": "@sakari/ecs",
   "version": "0.0.1",
   "license": "MIT",
   "description": "entity component system",
@@ -8,8 +8,9 @@
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "scripts": {
+    "clean": "rm -rf dist",
     "test": "yarn jest",
-    "build": "yarn tsc && yarn test"
+    "build": "yarn clean && yarn tsc && yarn test"
   },
   "repository": {
     "type": "git",
