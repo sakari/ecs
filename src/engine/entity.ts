@@ -15,6 +15,20 @@ export type EntityComponents<Registry, Components extends keyof Registry> = {
 } & { [P in Components]: Registry[P] };
 
 export interface Actions<Registry> {
+  addComponent: <Component extends keyof Registry>(
+    entity: EntityComponents<Registry, keyof Registry>,
+    component: Component,
+    props: Registry[Component]
+  ) => void;
+  removeComponent: <Component extends keyof Registry>(
+    entity: EntityComponents<Registry, Component>,
+    component: Component
+  ) => void;
+  set: <Component extends keyof Registry>(
+    entity: EntityComponents<Registry, Component>,
+    component: Component,
+    props: Registry[Component]
+  ) => void;
   removeEntity: (id: EntityId) => void;
   createEntity: (
     components: { [P in keyof Registry]: Registry[P] }

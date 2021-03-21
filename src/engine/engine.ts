@@ -41,7 +41,30 @@ export class Engine<Registry> {
       components: { [P in keyof Registry]: Registry[P] };
     }> = [];
     const removed: Record<string, true> = {};
+    const sets: Array<{
+      entity: entity.EntityComponents<Registry, any>;
+      component: keyof Registry;
+      props: any;
+    }> = [];
+    const removedComponents: Array<{
+      entity: entity.EntityComponents<Registry, any>;
+      component: keyof Registry;
+    }> = [];
+    const addedComponents: Array<{
+      entity: entity.EntityComponents<Registry, any>;
+      component: keyof Registry;
+      props: any;
+    }> = [];
     const actions: Actions<Registry> = {
+      addComponent: (entity, component, props) => {
+        addedComponents.push({ entity, component, props });
+      },
+      removeComponent: (entity, component) => {
+        removedComponents.push({ entity, component });
+      },
+      set: (entity, component, props) => {
+        sets.push({ entity, component, props });
+      },
       removeEntity: (id) => {
         removed[id] = true;
       },
@@ -63,6 +86,32 @@ export class Engine<Registry> {
       this.systems.forEach((system) => {
         system.entities.add({ id: key.id, ...key.components });
       });
+    });
+    addedComponents.forEach((opts) => {
+      if (opts.entity[opts.component]) {
+        return;
+      }
+      opts.entity[opts.component] = opts.props;
+      this.systems.forEach((system) => {
+        system.entities.add(opts.entity);
+      });
+    });
+    removedComponents.forEach((opts) => {
+      if (!opts.entity[opts.component]) {
+        return;
+      }
+      this.systems.forEach((system) => {
+        system.entities.remove(opts.entity.id);
+      });
+      delete opts.entity[opts.component];
+      this.systems.forEach((system) => {
+        system.entities.add(opts.entity);
+      });
+    });
+    sets.forEach((opts) => {
+      if (opts.entity[opts.component]) {
+        opts.entity[opts.component] = opts.props;
+      }
     });
   }
 }
