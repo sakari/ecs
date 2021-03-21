@@ -35,7 +35,7 @@ export class Engine<Registry> {
     return c.id;
   }
 
-  run() {
+  step() {
     const created: Array<{
       id: entity.EntityId;
       components: { [P in keyof Registry]: Registry[P] };

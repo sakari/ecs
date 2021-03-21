@@ -34,9 +34,9 @@ describe("Engine", () => {
       e.addEntity({
         position: { props: { x: 1 as entity.Pos, y: 2 as entity.Pos } },
       });
-      e.run();
+      e.step();
       expect(deleted).toBeFalsy();
-      e.run();
+      e.step();
       expect(deleted).toBeTruthy();
     });
 
@@ -53,9 +53,9 @@ describe("Engine", () => {
           [created] = entities.byTag("positioned");
         }),
       ]);
-      e.run();
+      e.step();
       expect(created).toBeUndefined();
-      e.run();
+      e.step();
       expect(created).toEqual(
         expect.objectContaining({ position: { props: { x: 2, y: 8 } } })
       );
@@ -71,7 +71,7 @@ describe("Engine", () => {
       const id = e.addEntity({
         position: { props: { x: 1 as entity.Pos, y: 2 as entity.Pos } },
       });
-      e.run();
+      e.step();
       expect(entity!.id).toEqual(id);
     });
   });
