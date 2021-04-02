@@ -17,7 +17,7 @@ export class Engine<Registry> {
   }
 
   addEntity(
-    components: { [P in keyof Registry]: Registry[P] }
+    components: { [P in keyof Registry]?: Registry[P] }
   ): entity.EntityId {
     const id = this.createEntity(components);
     this.systems.forEach((system) => {
@@ -27,7 +27,7 @@ export class Engine<Registry> {
   }
 
   private createEntity(
-    components: { [P in keyof Registry]: Registry[P] }
+    components: { [P in keyof Registry]?: Registry[P] }
   ): entity.EntityId {
     // @ts-ignore
     const c: entity.EntityComponents<Registry, keyof Registry> = components;

@@ -1,7 +1,7 @@
 import * as engine from "../engine";
 import * as components from "../components";
 
-type Registry = {
+export type Registry = {
   camera: components.Camera;
   point: components.Point;
 };

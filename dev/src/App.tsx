@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import * as ecs from '@sakari/ecs'
+import * as ecs from '@sakari/ecs';
 import ViewPort from './ViewPort';
+import * as components from '../../dist/src/components';
+
+type Registry = {
+  camera: components.Camera;
+  point: components.Point;
+  speed: components.Speed2d;
+}
 
 function createEngine() {
-  const svgDraw = ecs.systems.svgDraw.svgDraw();
-  const engine = new ecs.engine.engine.Engine([svgDraw.system]);
+  const svgDraw = ecs.systems.svgDraw.svgDraw<Registry>();
+  const mover = ecs.systems.move2d.move<Registry>();
+  const engine = new ecs.engine.engine.Engine<Registry>([svgDraw.system, mover.system]);
   engine.addEntity({
     point: {
       props: {

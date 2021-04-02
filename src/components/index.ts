@@ -1,5 +1,10 @@
 import { Component } from "../engine/entity";
 
+export type Speed2d = Component<{
+  dxMs: number;
+  dyMs: number;
+}>;
+
 export type Point = Component<{
   x: number;
   y: number;
