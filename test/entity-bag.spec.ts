@@ -32,9 +32,9 @@ describe("EntityBag", () => {
       const [e] = bag.byTag("other");
       expect(() => {
         // @ts-expect-error tag does not have the component
-        e!.pos.props.x;
+        e!.pos.x;
         // ok
-        e!.some.props.some;
+        e!.some.some;
       }).toThrow();
     });
 
@@ -42,11 +42,11 @@ describe("EntityBag", () => {
       const bag = givenABag();
       const someEntity = {
         id: "1" as entity.EntityId,
-        some: { props: { some: 1 } },
+        some: { some: 1 },
       };
       const posEntity = {
         id: "2" as entity.EntityId,
-        position: { props: { x: 1 as entity.Pos, y: 1 as entity.Pos } },
+        position: { x: 1 as entity.Pos, y: 1 as entity.Pos },
       };
       bag.add(someEntity);
       bag.add(posEntity);
@@ -57,11 +57,11 @@ describe("EntityBag", () => {
       const bag = givenABag();
       bag.add({
         id: "1" as entity.EntityId,
-        some: { props: { some: 1 } },
+        some: { some: 1 },
       });
       bag.add({
         id: "2" as entity.EntityId,
-        some: { props: { some: 1 } },
+        some: { some: 1 },
       });
       bag.remove("1" as entity.EntityId);
       expect(bag.byTag("other")).toEqual([

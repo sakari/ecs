@@ -2,9 +2,7 @@ import { EntityBag } from "./entity-bag";
 
 export type EntityId = string & { brand: "EntityId" };
 
-export interface Component<Props> {
-  props: Props;
-}
+export type Component<Props> = Props;
 
 export type AnyEntityComponents<Registry, Components extends keyof Registry> = {
   id: EntityId;

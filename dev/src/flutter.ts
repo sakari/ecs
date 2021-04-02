@@ -24,14 +24,12 @@ export function flutter<R extends Registry>(): {
         }
         for (const fluttering of entities.byTag("flutter")) {
           actions.set(fluttering, "speed", {
-            props: {
-              dxMs:
-                fluttering.speed.props.dxMs +
-                ((Math.random() - .5) * clock.clock.props.deltaMs) * .001,
-              dyMs:
-                fluttering.speed.props.dyMs +
-                ((Math.random() - .5) * clock.clock.props.deltaMs) * .001,
-            },
+            dxMs:
+              fluttering.speed.dxMs +
+              ((Math.random() - .5) * clock.clock.deltaMs) * .001,
+            dyMs:
+              fluttering.speed.dyMs +
+              ((Math.random() - .5) * clock.clock.deltaMs) * .001,
           });
         }
       },

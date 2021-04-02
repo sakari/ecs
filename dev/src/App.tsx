@@ -15,20 +15,14 @@ type Registry = {
 function createCircle() {
   return {
     point: {
-      props: {
-        x: 0, y: 0
-      }
+      x: 0, y: 0
     },
     speed: {
-      props: {
-        dxMs: (Math.random() - .5) * .01,
-          dyMs: (Math.random()  -.5) * .01
-      }
+      dxMs: (Math.random() - .5) * .01,
+      dyMs: (Math.random()  -.5) * .01
     },
     circle: {
-      props: {
-        radius: 20
-      }
+      radius: 20
     }
   }
 }
@@ -39,7 +33,7 @@ function createEngine() {
   const flutterer = flutter.flutter<Registry>();
   const engine = new ecs.engine.engine.Engine<Registry>([flutterer.system, svgDraw.system, mover.system]);
   const clock = engine.addEntity({
-    clock: { props: { deltaMs: 0 }}
+    clock: { deltaMs: 0 }
   })
   let start: null | number = null;
   let running = false;
@@ -58,7 +52,7 @@ function createEngine() {
     const deltaMs = start === null ? 0 : time - start;
     start = time;
     console.log(deltaMs);
-    engine.set(clock, 'clock', { props: { deltaMs }});
+    engine.set(clock, 'clock', { deltaMs });
     engine.step();
     setTimeout(() => {
       if (running) {
@@ -71,17 +65,13 @@ function createEngine() {
   }
   engine.addEntity({
     point: {
-      props: {
-        x: 0, y: 0
-      }
+      x: 0, y: 0
     },
     camera: {
-      props: {
-        width: 1000,
-        height: 1000,
-        zoom: 1,
-        tag: 'main'
-      }
+      width: 1000,
+      height: 1000,
+      zoom: 1,
+      tag: 'main'
     }
   });
   return { svgDraw, engine, run: toggle };

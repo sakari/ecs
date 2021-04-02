@@ -32,7 +32,7 @@ describe("Engine", () => {
         }),
       ]);
       e.addEntity({
-        position: { props: { x: 1 as entity.Pos, y: 2 as entity.Pos } },
+        position: { x: 1 as entity.Pos, y: 2 as entity.Pos },
       });
       e.step();
       expect(deleted).toBeFalsy();
@@ -46,7 +46,7 @@ describe("Engine", () => {
         withSystem((actions, entities) => {
           if (entities.byTag("positioned").length === 0) {
             actions.createEntity({
-              position: { props: { x: 2 as entity.Pos, y: 8 as entity.Pos } },
+              position: { x: 2 as entity.Pos, y: 8 as entity.Pos },
             });
             return;
           }
@@ -57,7 +57,7 @@ describe("Engine", () => {
       expect(created).toBeUndefined();
       e.step();
       expect(created).toEqual(
-        expect.objectContaining({ position: { props: { x: 2, y: 8 } } })
+        expect.objectContaining({ position: { x: 2, y: 8 } })
       );
     });
 
@@ -69,7 +69,7 @@ describe("Engine", () => {
         }),
       ]);
       const id = e.addEntity({
-        position: { props: { x: 1 as entity.Pos, y: 2 as entity.Pos } },
+        position: { x: 1 as entity.Pos, y: 2 as entity.Pos },
       });
       e.step();
       expect(entity!.id).toEqual(id);

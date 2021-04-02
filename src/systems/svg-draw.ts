@@ -44,18 +44,18 @@ export function svgDraw<R extends Registry>(): {
         if (!camera) {
           return;
         }
-        const canvas = canvases[camera.camera.props.tag];
+        const canvas = canvases[camera.camera.tag];
         if (!canvas) {
           return;
         }
-        canvas.setAttribute("width", "" + camera.camera.props.width);
-        canvas.setAttribute("height", "" + camera.camera.props.height);
-        const offsetX = -camera.point.props.x + camera.camera.props.width / 2;
-        const offsetY = -camera.point.props.y + camera.camera.props.height / 2;
+        canvas.setAttribute("width", "" + camera.camera.width);
+        canvas.setAttribute("height", "" + camera.camera.height);
+        const offsetX = -camera.point.x + camera.camera.width / 2;
+        const offsetY = -camera.point.y + camera.camera.height / 2;
         for (const circle of entities.byTag("circle")) {
           let handle = (circle as any)[svgHandle];
-          const cx = circle.point.props.x + offsetX;
-          const cy = circle.point.props.y + offsetY;
+          const cx = circle.point.x + offsetX;
+          const cy = circle.point.y + offsetY;
           if (!handle) {
             handle = document.createElementNS(
               "http://www.w3.org/2000/svg",
@@ -66,13 +66,13 @@ export function svgDraw<R extends Registry>(): {
             handle.setAttribute("fill", "red");
             handle.setAttribute("cx", cx);
             handle.setAttribute("cy", cy);
-            handle.setAttribute("r", circle.circle.props.radius);
+            handle.setAttribute("r", circle.circle.radius);
             canvas.appendChild(handle);
             (circle as any)[svgHandle] = handle;
           }
           handle.setAttribute("cx", cx);
           handle.setAttribute("cy", cy);
-          handle.setAttribute("r", circle.circle.props.radius);
+          handle.setAttribute("r", circle.circle.radius);
         }
       },
     },

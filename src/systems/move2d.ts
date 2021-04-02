@@ -26,14 +26,12 @@ export function move<R extends Registry>(): {
         }
         for (const movable of entities.byTag("movable")) {
           actions.set(movable, "point", {
-            props: {
-              x:
-                movable.point.props.x +
-                movable.speed.props.dxMs * clock.clock.props.deltaMs,
-              y:
-                movable.point.props.y +
-                movable.speed.props.dyMs * clock.clock.props.deltaMs,
-            },
+            x:
+              movable.point.x +
+              movable.speed.dxMs * clock.clock.deltaMs,
+            y:
+              movable.point.y +
+              movable.speed.dyMs * clock.clock.deltaMs,
           });
         }
       },
