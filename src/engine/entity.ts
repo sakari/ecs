@@ -38,18 +38,9 @@ export type Tags<Components> = Record<string, Components>;
 
 type ComponentSelector<T> = { [K in keyof T]: Set<T[K]> };
 
-export interface Clock {
-  timeMs: number;
-  deltaMs: number;
-}
-
 export interface System<Registry, T extends Tags<keyof Registry>> {
   componentSelector: ComponentSelector<T>;
-  run: (
-    clock: Clock,
-    actions: Actions<Registry>,
-    entities: EntityBag<Registry, T>
-  ) => void;
+  run: (actions: Actions<Registry>, entities: EntityBag<Registry, T>) => void;
 }
 
 export type Pos = number & { brand: "Position" };

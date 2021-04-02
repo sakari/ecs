@@ -1,5 +1,9 @@
 import { Component } from "../engine/entity";
 
+export type Clock = Component<{
+  deltaMs: number;
+}>;
+
 export type Speed2d = Component<{
   dxMs: number;
   dyMs: number;

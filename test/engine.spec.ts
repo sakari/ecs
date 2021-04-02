@@ -19,13 +19,11 @@ function withSystem(
 }
 
 describe("Engine", () => {
-  const clock: entity.Clock = { timeMs: Date.now(), deltaMs: 10 };
-
   describe("run", () => {
     it("allows deleting entities", () => {
       let deleted = false;
       const e = new engine.Engine([
-        withSystem((clock, actions, entities) => {
+        withSystem((actions, entities) => {
           if (entities.byTag("positioned").length === 1) {
             actions.removeEntity(entities.byTag("positioned")[0]!.id);
             return;
@@ -36,16 +34,16 @@ describe("Engine", () => {
       e.addEntity({
         position: { props: { x: 1 as entity.Pos, y: 2 as entity.Pos } },
       });
-      e.step(clock);
+      e.step();
       expect(deleted).toBeFalsy();
-      e.step(clock);
+      e.step();
       expect(deleted).toBeTruthy();
     });
 
     it("allows creating new entities", () => {
       let created: any;
       const e = new engine.Engine([
-        withSystem((clock, actions, entities) => {
+        withSystem((actions, entities) => {
           if (entities.byTag("positioned").length === 0) {
             actions.createEntity({
               position: { props: { x: 2 as entity.Pos, y: 8 as entity.Pos } },
@@ -55,9 +53,9 @@ describe("Engine", () => {
           [created] = entities.byTag("positioned");
         }),
       ]);
-      e.step(clock);
+      e.step();
       expect(created).toBeUndefined();
-      e.step(clock);
+      e.step();
       expect(created).toEqual(
         expect.objectContaining({ position: { props: { x: 2, y: 8 } } })
       );
@@ -66,14 +64,14 @@ describe("Engine", () => {
     it("calls the system with entities", () => {
       let entity: any;
       const e = new engine.Engine([
-        withSystem((clock, actions, entities) => {
+        withSystem((actions, entities) => {
           [entity] = entities.byTag("positioned");
         }),
       ]);
       const id = e.addEntity({
         position: { props: { x: 1 as entity.Pos, y: 2 as entity.Pos } },
       });
-      e.step(clock);
+      e.step();
       expect(entity!.id).toEqual(id);
     });
   });

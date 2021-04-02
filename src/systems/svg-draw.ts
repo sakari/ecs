@@ -32,7 +32,7 @@ export function svgDraw<R extends Registry>(): {
     },
     system: {
       componentSelector: { camera: new Set(["camera", "point"]) },
-      run: (_clock, _actions, entities) => {
+      run: (_actions, entities) => {
         const [camera] = entities.byTag("camera");
         if (!camera) {
           return;
