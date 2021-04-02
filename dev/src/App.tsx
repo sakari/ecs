@@ -22,8 +22,8 @@ function createCircle() {
     },
     speed: {
       props: {
-        dxMs: .01,
-          dyMs: .01
+        dxMs: (Math.random() - .5) * .01,
+          dyMs: (Math.random()  -.5) * .01
       }
     },
     circle: {
@@ -42,17 +42,32 @@ function createEngine() {
   const clock = engine.addEntity({
     clock: { props: { deltaMs: 0 }}
   })
-  let start: undefined | number;
+  let start: null | number = null;
+  let running = false;
+
+  function toggle() {
+    if (running) {
+      running = false;
+    } else {
+      running = true;
+      start = null;
+      window.requestAnimationFrame(step)
+    }
+  }
 
   function step(time: number) {
-    const deltaMs = start === undefined ? 0 : time - start;
+    const deltaMs = start === null ? 0 : time - start;
     start = time;
     console.log(deltaMs);
     engine.set(clock, 'clock', { props: { deltaMs }});
     engine.step();
-    window.requestAnimationFrame(step);
+    setTimeout(() => {
+      if (running) {
+        window.requestAnimationFrame(step);
+      }
+    }, 20);
   };
-  for(let i = 0; i < 1000; i++) {
+  for(let i = 0; i < 2000; i++) {
     engine.addEntity(createCircle());
   }
   engine.addEntity({
@@ -70,7 +85,7 @@ function createEngine() {
       }
     }
   });
-  return { svgDraw, engine, run: () => { window.requestAnimationFrame(step) } };
+  return { svgDraw, engine, run: toggle };
 }
 
 function App() {
