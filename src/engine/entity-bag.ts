@@ -4,8 +4,11 @@ type Selector<T> = { [P in keyof T]: Set<T[P]> };
 
 export class EntityBag<
   Registry,
-  Tags extends { [tag: string]: keyof Registry }
+  Tags extends { [tag: string]: keyof Registry },
+  State = never
 > {
+  private readonly states: Record<string, State> = {};
+
   private readonly entities: Record<
     string,
     Array<entity.EntityComponents<Registry, any>>
@@ -16,6 +19,14 @@ export class EntityBag<
       (memo, item) => ({ ...memo, [item]: [] }),
       {}
     );
+  }
+
+  setState(entity: entity.EntityComponents<Registry, any>, state: State) {
+    this.states[entity.id] = state;
+  }
+
+  getState(entity: entity.EntityComponents<Registry, any>): State | undefined {
+    return this.states[entity.id];
   }
 
   byTag<Tag extends keyof Tags>(
@@ -29,6 +40,7 @@ export class EntityBag<
   }
 
   remove(id: entity.EntityId) {
+    delete this.states[id];
     for (const tag in this.tags) {
       // todo: this is horribly inefficient
       this.entities[tag] = this.entities[tag]!.filter(

@@ -29,7 +29,7 @@ export class Engine<Registry> {
   ) {
     const entity = this.entities.get(entityId);
     if (entity && entity[component]) {
-      entity[component] = props as any;
+      Object.assign(entity[component], props);
     }
   }
 

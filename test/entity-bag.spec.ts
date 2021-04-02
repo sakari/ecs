@@ -8,17 +8,29 @@ interface Registry {
 }
 
 describe("EntityBag", () => {
+  function givenABag<State = never>() {
+    return new entitybag.EntityBag<
+      Registry,
+      { pos: "position" | "rotation"; other: "some" },
+      State
+    >({
+      other: new Set(["some"]),
+      pos: new Set(["position", "rotation"]),
+    });
+  }
+  describe("state", () => {
+    it("stores state for the entities in the bag", () => {
+      const bag = givenABag<string>();
+      const someEntity = {
+        id: "1" as entity.EntityId,
+        some: { some: 1 },
+      };
+      bag.add(someEntity);
+      bag.setState(someEntity, "state");
+      expect(bag.getState(someEntity)).toEqual("state");
+    });
+  });
   describe("byTag", () => {
-    function givenABag() {
-      return new entitybag.EntityBag<
-        Registry,
-        { pos: "position" | "rotation"; other: "some" }
-      >({
-        other: new Set(["some"]),
-        pos: new Set(["position", "rotation"]),
-      });
-    }
-
     it("allows only existing tags", () => {
       const bag = givenABag();
       // ok

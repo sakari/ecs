@@ -36,9 +36,16 @@ export type Tags<Components> = Record<string, Components>;
 
 type ComponentSelector<T> = { [K in keyof T]: Set<T[K]> };
 
-export interface System<Registry, T extends Tags<keyof Registry>> {
+export interface System<
+  Registry,
+  T extends Tags<keyof Registry>,
+  State = never
+> {
   componentSelector: ComponentSelector<T>;
-  run: (actions: Actions<Registry>, entities: EntityBag<Registry, T>) => void;
+  run: (
+    actions: Actions<Registry>,
+    entities: EntityBag<Registry, T, State>
+  ) => void;
 }
 
 export type Pos = number & { brand: "Position" };

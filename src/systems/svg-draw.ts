@@ -10,12 +10,11 @@ export type Registry = {
 type Release = () => void;
 export type SetContainer = (tag: string, ref: HTMLElement) => Release;
 
-const svgHandle = Symbol();
-
 export function svgDraw<R extends Registry>(): {
   system: engine.entity.System<
     R,
-    { camera: "camera" | "point"; circle: "circle" | "point" }
+    { camera: "camera" | "point"; circle: "circle" | "point" },
+    SVGCircleElement
   >;
   setContainer: SetContainer;
 } {
@@ -53,7 +52,7 @@ export function svgDraw<R extends Registry>(): {
         const offsetX = -camera.point.x + camera.camera.width / 2;
         const offsetY = -camera.point.y + camera.camera.height / 2;
         for (const circle of entities.byTag("circle")) {
-          let handle = (circle as any)[svgHandle];
+          let handle = entities.getState(circle);
           const cx = circle.point.x + offsetX;
           const cy = circle.point.y + offsetY;
           if (!handle) {
@@ -64,15 +63,15 @@ export function svgDraw<R extends Registry>(): {
             handle.setAttribute("stroke", "black");
             handle.setAttribute("stroke-width", "1");
             handle.setAttribute("fill", "red");
-            handle.setAttribute("cx", cx);
-            handle.setAttribute("cy", cy);
-            handle.setAttribute("r", circle.circle.radius);
+            handle.setAttribute("cx", cx as any);
+            handle.setAttribute("cy", cy as any);
+            handle.setAttribute("r", circle.circle.radius as any);
             canvas.appendChild(handle);
-            (circle as any)[svgHandle] = handle;
+            entities.setState(circle, handle);
           }
-          handle.setAttribute("cx", cx);
-          handle.setAttribute("cy", cy);
-          handle.setAttribute("r", circle.circle.radius);
+          handle.setAttribute("cx", cx as any);
+          handle.setAttribute("cy", cy as any);
+          handle.setAttribute("r", circle.circle.radius as any);
         }
       },
     },
