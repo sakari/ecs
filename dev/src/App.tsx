@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import * as ecs from '@sakari/ecs';
 import ViewPort from './ViewPort';
