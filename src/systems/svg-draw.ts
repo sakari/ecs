@@ -24,8 +24,6 @@ export function svgDraw<R extends Registry>(): {
         "http://www.w3.org/2000/svg",
         "svg"
       );
-      canvas.setAttribute("width", "1000");
-      canvas.setAttribute("height", "1000");
       canvases[tag] = canvas;
       viewPort.innerHTML = "";
       viewPort.appendChild(canvas);
@@ -48,11 +46,19 @@ export function svgDraw<R extends Registry>(): {
         if (!canvas) {
           return;
         }
+        canvas.setAttribute("width", "" + camera.camera.props.width);
+        canvas.setAttribute("height", "" + camera.camera.props.height);
+        const offsetX = -camera.point.props.x + camera.camera.props.width / 2;
+        const offsetY = -camera.point.props.y + camera.camera.props.height / 2;
         const circles = entities.byTag("circle");
         canvas.innerHTML = circles
           .map(
             (circle) => `
-        <circle cx="${circle.point.props.x}" cy="${circle.point.props.y}" r="${circle.circle.props.radius}" stroke="black" stroke-width="3" fill="red" />
+        <circle cx="${circle.point.props.x + offsetX}" cy="${
+              circle.point.props.y + offsetY
+            }" r="${
+              circle.circle.props.radius
+            }" stroke="black" stroke-width="3" fill="red" />
         `
           )
           .join("");
