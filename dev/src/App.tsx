@@ -9,12 +9,31 @@ type Registry = {
   camera: components.Camera;
   point: components.Point;
   speed: components.Speed2d;
+  circle: components.Circle2d;
 }
 
 function createEngine() {
   const svgDraw = ecs.systems.svgDraw.svgDraw<Registry>();
   const mover = ecs.systems.move2d.move<Registry>();
   const engine = new ecs.engine.engine.Engine<Registry>([svgDraw.system, mover.system]);
+  engine.addEntity({
+    point: {
+      props: {
+        x: 0, y: 0
+      }
+    },
+    speed: {
+      props: {
+        dxMs: 10,
+        dyMs: 10
+      }
+    },
+    circle: {
+      props: {
+        radius: 20
+      }
+    }
+  })
   engine.addEntity({
     point: {
       props: {

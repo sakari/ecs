@@ -16,3 +16,5 @@ export type Camera = Component<{
   zoom: number;
   tag: string;
 }>;
+
+export type Circle2d = Component<{ radius: number }>;
