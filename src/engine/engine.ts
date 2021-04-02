@@ -35,7 +35,7 @@ export class Engine<Registry> {
     return c.id;
   }
 
-  step() {
+  step(clock: entity.Clock) {
     const created: Array<{
       id: entity.EntityId;
       components: { [P in keyof Registry]: Registry[P] };
@@ -75,7 +75,7 @@ export class Engine<Registry> {
       },
     };
     this.systems.forEach((system) =>
-      system.system.run(actions, system.entities)
+      system.system.run(clock, actions, system.entities)
     );
     Object.keys(removed).forEach((key) => {
       this.systems.forEach((system) => {
