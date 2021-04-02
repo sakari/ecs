@@ -4,13 +4,17 @@ import * as components from "../components";
 export type Registry = {
   camera: components.Camera;
   point: components.Point;
+  circle: components.Circle2d;
 };
 
 type Release = () => void;
 export type SetContainer = (tag: string, ref: HTMLElement) => Release;
 
 export function svgDraw<R extends Registry>(): {
-  system: engine.entity.System<R, { camera: "camera" | "point" }>;
+  system: engine.entity.System<
+    R,
+    { camera: "camera" | "point"; circle: "circle" | "point" }
+  >;
   setContainer: SetContainer;
 } {
   const canvases: Record<string, SVGSVGElement> = {};
@@ -20,8 +24,8 @@ export function svgDraw<R extends Registry>(): {
         "http://www.w3.org/2000/svg",
         "svg"
       );
-      canvas.setAttribute("width", "100");
-      canvas.setAttribute("height", "100");
+      canvas.setAttribute("width", "1000");
+      canvas.setAttribute("height", "1000");
       canvases[tag] = canvas;
       viewPort.innerHTML = "";
       viewPort.appendChild(canvas);
@@ -31,7 +35,10 @@ export function svgDraw<R extends Registry>(): {
       };
     },
     system: {
-      componentSelector: { camera: new Set(["camera", "point"]) },
+      componentSelector: {
+        camera: new Set(["camera", "point"]),
+        circle: new Set(["circle", "point"]),
+      },
       run: (_actions, entities) => {
         const [camera] = entities.byTag("camera");
         if (!camera) {
@@ -41,9 +48,14 @@ export function svgDraw<R extends Registry>(): {
         if (!canvas) {
           return;
         }
-        canvas.innerHTML = `
-        <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
-        `;
+        const circles = entities.byTag("circle");
+        canvas.innerHTML = circles
+          .map(
+            (circle) => `
+        <circle cx="${circle.point.props.x}" cy="${circle.point.props.y}" r="${circle.circle.props.radius}" stroke="black" stroke-width="3" fill="red" />
+        `
+          )
+          .join("");
       },
     },
   };

@@ -1,9 +1,15 @@
 import * as entity from "./entity";
-import { Actions } from "./entity";
+import { Actions, AnyEntityComponents } from "./entity";
 import { EntityBag } from "./entity-bag";
 
 export class Engine<Registry> {
   private nextId = 0;
+
+  private readonly entities: Map<
+    entity.EntityId,
+    AnyEntityComponents<Registry, any>
+  > = new Map();
+
   private readonly systems: Array<{
     entities: EntityBag<Registry, any>;
     system: entity.System<Registry, any>;
@@ -16,12 +22,25 @@ export class Engine<Registry> {
     }));
   }
 
+  set<Component extends keyof Registry>(
+    entityId: entity.EntityId,
+    component: Component,
+    props: Registry[Component]
+  ) {
+    const entity = this.entities.get(entityId);
+    if (entity && entity[component]) {
+      entity[component] = props as any;
+    }
+  }
+
   addEntity(
     components: { [P in keyof Registry]?: Registry[P] }
   ): entity.EntityId {
     const id = this.createEntity(components);
+    const entity = { id, ...components };
+    this.entities.set(id, entity);
     this.systems.forEach((system) => {
-      system.entities.add({ id, ...components });
+      system.entities.add(entity);
     });
     return id;
   }
@@ -78,13 +97,16 @@ export class Engine<Registry> {
       system.system.run(actions, system.entities)
     );
     Object.keys(removed).forEach((key) => {
+      this.entities.delete(key as entity.EntityId);
       this.systems.forEach((system) => {
         system.entities.remove(key as entity.EntityId);
       });
     });
     created.forEach((key) => {
+      const entity = { id: key.id, ...key.components };
+      this.entities.set(key.id, entity);
       this.systems.forEach((system) => {
-        system.entities.add({ id: key.id, ...key.components });
+        system.entities.add(entity);
       });
     });
     addedComponents.forEach((opts) => {
@@ -109,9 +131,7 @@ export class Engine<Registry> {
       });
     });
     sets.forEach((opts) => {
-      if (opts.entity[opts.component]) {
-        opts.entity[opts.component] = opts.props;
-      }
+      this.set(opts.entity.id, opts.component, opts.props);
     });
   }
 }

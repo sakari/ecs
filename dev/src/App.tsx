@@ -16,9 +16,19 @@ function createEngine() {
   const svgDraw = ecs.systems.svgDraw.svgDraw<Registry>();
   const mover = ecs.systems.move2d.move<Registry>();
   const engine = new ecs.engine.engine.Engine<Registry>([svgDraw.system, mover.system]);
-  engine.addEntity({
+  const clock = engine.addEntity({
     clock: { props: { deltaMs: 0 }}
   })
+  let start: undefined | number;
+
+  function step(time: number) {
+    const deltaMs = start === undefined ? 0 : time - start;
+    start = time;
+    console.log(deltaMs);
+    engine.set(clock, 'clock', { props: { deltaMs }});
+    engine.step();
+    window.requestAnimationFrame(step);
+  };
   engine.addEntity({
     point: {
       props: {
@@ -27,8 +37,8 @@ function createEngine() {
     },
     speed: {
       props: {
-        dxMs: 10,
-        dyMs: 10
+        dxMs: .01,
+        dyMs: .01
       }
     },
     circle: {
@@ -52,15 +62,15 @@ function createEngine() {
       }
     }
   });
-  return { svgDraw, engine };
+  return { svgDraw, engine, run: () => { window.requestAnimationFrame(step) } };
 }
 
 function App() {
   const [state] = useState(createEngine());
   return (
     <div className="App">
+      <button onClick={() => { window.requestAnimationFrame(state.run)}}>run</button>
       <ViewPort setContainer={state.svgDraw.setContainer}></ViewPort>
-      <button onClick={() => state.engine.step()}>Step</button>
     </div>
   );
 }
