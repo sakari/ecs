@@ -51,14 +51,11 @@ function createEngine() {
   function step(time: number) {
     const deltaMs = start === null ? 0 : time - start;
     start = time;
-    console.log(deltaMs);
     engine.set(clock, 'clock', { deltaMs });
     engine.step();
-    setTimeout(() => {
-      if (running) {
-        window.requestAnimationFrame(step);
-      }
-    }, 20);
+    if (running) {
+      window.requestAnimationFrame(step);
+    }
   };
   for(let i = 0; i < 2000; i++) {
     engine.addEntity(createCircle());
