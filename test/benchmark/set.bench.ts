@@ -4,10 +4,10 @@ import * as setup from "./setup";
 const suite = new Suite();
 
 suite
-  .add("1000 entities moving for 1_000 steps", {
+  .add("1000 entities moving for 10_000 steps", {
     fn: () => {
       const { clock, engine } = setup.setup();
-      for (let i = 0; i < 1_000; i++) {
+      for (let i = 0; i < 10_000; i++) {
         engine.set(clock, "clock", { deltaMs: 10 });
         engine.step();
       }
