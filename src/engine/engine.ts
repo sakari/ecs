@@ -9,9 +9,57 @@ interface Sets<Registry> {
   props: any;
 }
 
+class Step<Registry> {
+  constructor(
+    private setsPool: pool.Pool<Sets<Registry>>,
+    private getEntityId: () => entity.EntityId
+  ) {}
+  created: Array<{
+    id: entity.EntityId;
+    components: { [P in keyof Registry]: Registry[P] };
+  }> = [];
+  removed: string[] = [];
+  sets: Array<Sets<Registry>> = [];
+  removedComponents: Array<{
+    entity: entity.EntityComponents<Registry, any>;
+    component: keyof Registry;
+  }> = [];
+  addedComponents: Array<{
+    entity: entity.EntityComponents<Registry, any>;
+    component: keyof Registry;
+    props: any;
+  }> = [];
+
+  actions: Actions<Registry> = {
+    addComponent: (entity, component, props) => {
+      this.addedComponents.push({ entity, component, props });
+    },
+    removeComponent: (entity, component) => {
+      this.removedComponents.push({ entity, component });
+    },
+    set: (entity, component, props) => {
+      const set = this.setsPool.get();
+      set.entity = entity;
+      set.component = component;
+      set.props = props;
+      this.sets.push(set);
+    },
+    removeEntity: (id) => {
+      this.removed.push(id);
+    },
+    createEntity: (components) => {
+      const id = this.getEntityId();
+      this.created.push({ id, components });
+      return id;
+    },
+  };
+}
+
 export class Engine<Registry> {
   private nextId = 0;
-  private setsPool: pool.Pool<Sets<Registry>> = pool.pool(() => ({} as any))
+  private setsPool: pool.Pool<Sets<Registry>> = pool.pool(() => ({} as any));
+  private stepState = new Step(this.setsPool, () => this.getEntityId());
+
 
   private readonly entities: Map<
     entity.EntityId,
@@ -45,7 +93,7 @@ export class Engine<Registry> {
   addEntity(
     components: { [P in keyof Registry]?: Registry[P] }
   ): entity.EntityId {
-    const id = this.createEntity(components);
+    const id = this.getEntityId();
     const entity = { id, ...components };
     this.entities.set(id, entity);
     this.systems.forEach((system) => {
@@ -54,94 +102,57 @@ export class Engine<Registry> {
     return id;
   }
 
-  private createEntity(
-    components: { [P in keyof Registry]?: Registry[P] }
-  ): entity.EntityId {
-    // @ts-ignore
-    const c: entity.EntityComponents<Registry, keyof Registry> = components;
-    c.id = ("" + this.nextId++) as any;
-    return c.id;
+  private getEntityId(): entity.EntityId {
+    return ("" + this.nextId++) as any;
   }
-
   step() {
-    const created: Array<{
-      id: entity.EntityId;
-      components: { [P in keyof Registry]: Registry[P] };
-    }> = [];
-    const removed: Record<string, true> = {};
-    const sets: Array<Sets<Registry>> = [];
-    const removedComponents: Array<{
-      entity: entity.EntityComponents<Registry, any>;
-      component: keyof Registry;
-    }> = [];
-    const addedComponents: Array<{
-      entity: entity.EntityComponents<Registry, any>;
-      component: keyof Registry;
-      props: any;
-    }> = [];
-    const actions: Actions<Registry> = {
-      addComponent: (entity, component, props) => {
-        addedComponents.push({ entity, component, props });
-      },
-      removeComponent: (entity, component) => {
-        removedComponents.push({ entity, component });
-      },
-      set: (entity, component, props) => {
-        const set = this.setsPool.get();
-        set.entity = entity;
-        set.component = component;
-        set.props = props;
-        sets.push(set);
-      },
-      removeEntity: (id) => {
-        removed[id] = true;
-      },
-      createEntity: (components) => {
-        const id = this.createEntity(components as any);
-        created.push({ id, components });
-        return id;
-      },
-    };
     this.systems.forEach((system) =>
-      system.system.run(actions, system.entities)
+      system.system.run(this.stepState.actions, system.entities)
     );
-    Object.keys(removed).forEach((key) => {
+    let key: string | undefined;
+    while ((key = this.stepState.removed.pop())) {
       this.entities.delete(key as entity.EntityId);
       this.systems.forEach((system) => {
         system.entities.remove(key as entity.EntityId);
       });
-    });
-    created.forEach((key) => {
-      const entity = { id: key.id, ...key.components };
-      this.entities.set(key.id, entity);
+    }
+    let created;
+    while ((created = this.stepState.created.pop())) {
+      const entity = { id: created.id, ...created.components } as any;
+      this.entities.set(created.id, entity);
       this.systems.forEach((system) => {
         system.entities.add(entity);
       });
-    });
-    addedComponents.forEach((opts) => {
-      if (opts.entity[opts.component]) {
+    }
+    let added: any;
+    while ((added = this.stepState.addedComponents.pop())) {
+      if (added.entity[added.component]) {
         return;
       }
-      opts.entity[opts.component] = opts.props;
+      added.entity[added.component] = added.props;
       this.systems.forEach((system) => {
-        system.entities.add(opts.entity);
+        system.entities.add(added.entity);
       });
-    });
-    removedComponents.forEach((opts) => {
-      if (!opts.entity[opts.component]) {
+    }
+
+    let removed: any;
+    while ((removed = this.stepState.removedComponents.pop())) {
+      if (!removed.entity[removed.component]) {
         return;
       }
       this.systems.forEach((system) => {
-        system.entities.remove(opts.entity.id);
+        system.entities.remove(removed.entity.id);
       });
-      delete opts.entity[opts.component];
+      delete removed.entity[removed.component];
       this.systems.forEach((system) => {
-        system.entities.add(opts.entity);
+        system.entities.add(removed.entity);
       });
-    });
-    sets.forEach((opts) => {
-      this.set(opts.entity.id, opts.component, opts.props);
-      pool.free(opts);
-    });
+    }
+
+    let set: any;
+    while ((set = this.stepState.sets.pop())) {
+      this.set(set.entity.id, set.component, set.props);
+      pool.free(set);
+    }
   }
 }
