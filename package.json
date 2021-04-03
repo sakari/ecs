@@ -8,6 +8,7 @@
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "scripts": {
+    "test:performance": "node -r ts-node/register --gc-global --max-old-space-size=512 test/benchmark/set.bench.ts",
     "start": "nodemon --ext .ts,.json --watch src --watch test --exec yarn build",
     "clean": "rm -rf dist",
     "test": "yarn jest",
@@ -17,13 +18,16 @@
     "type": "git",
     "url": "https://github.com/sakari/ecs.git"
   },
-  "dependencies": {},
+  "dependencies": {
+  },
   "devDependencies": {
     "@types/jest": "26.0.15",
     "@types/lodash": "4.14.164",
     "@types/node": "13.13.16",
     "@typescript-eslint/eslint-plugin": "4.6.0",
     "@typescript-eslint/parser": "4.6.0",
+    "@types/benchmark": "^2.1.0",
+    "benchmark": "^2.1.4",
     "eslint": "7.12.1",
     "eslint-config-prettier": "6.15.0",
     "eslint-plugin-import": "2.22.1",
