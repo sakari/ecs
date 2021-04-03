@@ -1,9 +1,17 @@
 import * as entity from "./entity";
+import * as pool from "../pool";
 import { Actions, AnyEntityComponents } from "./entity";
 import { EntityBag } from "./entity-bag";
 
+interface Sets<Registry> {
+  entity: entity.EntityComponents<Registry, any>;
+  component: keyof Registry;
+  props: any;
+}
+
 export class Engine<Registry> {
   private nextId = 0;
+  private setsPool: pool.Pool<Sets<Registry>> = pool.pool(() => ({} as any))
 
   private readonly entities: Map<
     entity.EntityId,
@@ -31,6 +39,7 @@ export class Engine<Registry> {
     if (entity && entity[component]) {
       Object.assign(entity[component], props);
     }
+    pool.free(props);
   }
 
   addEntity(
@@ -60,11 +69,7 @@ export class Engine<Registry> {
       components: { [P in keyof Registry]: Registry[P] };
     }> = [];
     const removed: Record<string, true> = {};
-    const sets: Array<{
-      entity: entity.EntityComponents<Registry, any>;
-      component: keyof Registry;
-      props: any;
-    }> = [];
+    const sets: Array<Sets<Registry>> = [];
     const removedComponents: Array<{
       entity: entity.EntityComponents<Registry, any>;
       component: keyof Registry;
@@ -82,7 +87,11 @@ export class Engine<Registry> {
         removedComponents.push({ entity, component });
       },
       set: (entity, component, props) => {
-        sets.push({ entity, component, props });
+        const set = this.setsPool.get();
+        set.entity = entity;
+        set.component = component;
+        set.props = props;
+        sets.push(set);
       },
       removeEntity: (id) => {
         removed[id] = true;
@@ -132,6 +141,7 @@ export class Engine<Registry> {
     });
     sets.forEach((opts) => {
       this.set(opts.entity.id, opts.component, opts.props);
+      pool.free(opts);
     });
   }
 }
