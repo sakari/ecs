@@ -5,9 +5,9 @@ type Selector<T> = { [P in keyof T]: Set<T[P]> };
 export class EntityBag<
   Registry,
   Tags extends { [tag: string]: keyof Registry },
-  State = never
+  State extends { [T in keyof Tags]: any } = never
 > {
-  private readonly states: Record<string, State> = {};
+  private readonly states: { [T in keyof State]: Record<string, State[T]> };
 
   private readonly entities: Record<
     string,
@@ -15,18 +15,30 @@ export class EntityBag<
   >;
 
   constructor(private readonly tags: Selector<Tags>) {
+    this.states = Object.keys(tags).reduce(
+      (memo, tag) => ({ ...memo, [tag]: {} }),
+      {} as any
+    );
     this.entities = Object.keys(tags).reduce(
       (memo, item) => ({ ...memo, [item]: [] }),
       {}
     );
   }
 
-  setState(entity: entity.EntityComponents<Registry, any>, state: State) {
-    this.states[entity.id] = state;
+  setState<Tag extends keyof Tags>(
+    tag: Tag,
+    entity: entity.EntityComponents<Registry, any>,
+    state: State[Tag]
+  ) {
+    // @ts-ignore
+    this.states[tag][entity.id] = state;
   }
 
-  getState(entity: entity.EntityComponents<Registry, any>): State | undefined {
-    return this.states[entity.id];
+  getState<Tag extends keyof Tags>(
+    tag: Tag,
+    entity: entity.EntityComponents<Registry, any>
+  ): State[Tag] | undefined {
+    return this.states[tag][entity.id];
   }
 
   byTag<Tag extends keyof Tags>(
@@ -40,7 +52,9 @@ export class EntityBag<
   }
 
   remove(id: entity.EntityId) {
-    delete this.states[id];
+    for (const tag in this.tags) {
+      delete this.states[tag][id];
+    }
     for (const tag in this.tags) {
       // todo: this is horribly inefficient
       this.entities[tag] = this.entities[tag]!.filter(

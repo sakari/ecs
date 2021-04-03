@@ -39,7 +39,7 @@ type ComponentSelector<T> = { [K in keyof T]: Set<T[K]> };
 export interface System<
   Registry,
   T extends Tags<keyof Registry>,
-  State = never
+  State extends { [A in keyof T]: any } = never
 > {
   componentSelector: ComponentSelector<T>;
   run: (
