@@ -11,6 +11,7 @@ export function flutter<R extends Registry>(): {
     { flutter: "speed"; clock: "clock" }
     >;
 } {
+  const setPool = ecs.pool.pool<ecs.components.Speed2d>(() => ({} as any));
   return {
     system: {
       componentSelector: {
@@ -23,14 +24,12 @@ export function flutter<R extends Registry>(): {
           return;
         }
         for (const fluttering of entities.byTag("flutter")) {
-          actions.set(fluttering, "speed", {
-            dxMs:
-              fluttering.speed.dxMs +
-              ((Math.random() - .5) * clock.clock.deltaMs) * .001,
-            dyMs:
-              fluttering.speed.dyMs +
-              ((Math.random() - .5) * clock.clock.deltaMs) * .001,
-          });
+          const set = setPool.get();
+          set.dxMs = fluttering.speed.dxMs +
+            ((Math.random() - .5) * clock.clock.deltaMs) * .001;
+          set.dyMs = fluttering.speed.dyMs +
+            ((Math.random() - .5) * clock.clock.deltaMs) * .001;
+          actions.set(fluttering, "speed", set);
         }
       },
     },
