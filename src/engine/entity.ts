@@ -1,8 +1,15 @@
 import { EntityBag } from "./entity-bag";
 
-export type EntityId = string & { brand: "EntityId" };
+export type EntityId = string & { _brand: "EntityId" };
 
 export type Component<Props> = Props;
+
+export type Reference<
+  Registry,
+  Components extends keyof Registry
+> = EntityId & {
+  _selectors: { [T in Components]: Registry[T] };
+};
 
 export type AnyEntityComponents<Registry, Components extends keyof Registry> = {
   id: EntityId;

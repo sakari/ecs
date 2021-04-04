@@ -2,43 +2,39 @@ import React, { useState } from 'react';
 import '../../App.css';
 import * as ecs from '@sakari/ecs';
 import ViewPort from '../../ViewPort';
-import * as flutter from './flutter';
 import * as setup from '../setup';
 
 type Registry = {
-  speed: ecs.components.Speed2d;
   circle: ecs.components.Circle2d;
+  line: ecs.components.Line2d;
 } & setup.Registry
 
-function createCircle() {
+function createCircle(x: number, y: number, radius: number) {
   return {
     point: {
-      x: 0, y: 0
-    },
-    speed: {
-      dxMs: (Math.random() - .5) * .01,
-      dyMs: (Math.random()  -.5) * .01
+      x, y
     },
     circle: {
-      radius: 20
+      radius
     }
   }
 }
 
 function createEngine() {
-  const svgDraw = ecs.systems.svgDraw.svgDraw<Registry>();
   const canvasDraw = ecs.systems.canvasDraw.canvasDraw<Registry>();
-  const mover = ecs.systems.move2d.move<Registry>();
-  const flutterer = flutter.flutter<Registry>();
   const engine = new ecs.engine.engine.Engine<Registry>([
-    flutterer.system,
     canvasDraw.system,
-    mover.system
   ]);
   const { run } = setup.runner(engine);
-  for(let i = 0; i < 10_000; i++) {
-    engine.addEntity(createCircle());
-  }
+  const start = engine.addEntity(createCircle(-50, 0, 30));
+  const end = engine.addEntity(createCircle(50, 0, 30));
+  engine.addEntity({
+    line: {
+      startMagnitude: 0, startRadian: 0,
+      endMagnitude: 0, endRadian: 0,
+      start, end
+    }
+  });
   engine.addEntity({
     point: {
       x: 0, y: 0
@@ -62,3 +58,5 @@ export function App() {
     </div>
   );
 }
+
+export default App;

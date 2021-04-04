@@ -60,7 +60,6 @@ export class Engine<Registry> {
   private setsPool: pool.Pool<Sets<Registry>> = pool.pool(() => ({} as any));
   private stepState = new Step(this.setsPool, () => this.getEntityId());
 
-
   private readonly entities: Map<
     entity.EntityId,
     AnyEntityComponents<Registry, any>
@@ -90,16 +89,16 @@ export class Engine<Registry> {
     pool.free(props);
   }
 
-  addEntity(
-    components: { [P in keyof Registry]?: Registry[P] }
-  ): entity.EntityId {
+  addEntity<Components extends keyof Registry>(
+    components: { [P in Components]?: Registry[P] }
+  ): entity.Reference<Registry, Components> {
     const id = this.getEntityId();
     const entity = { id, ...components };
     this.entities.set(id, entity);
     this.systems.forEach((system) => {
-      system.entities.add(entity);
+      system.entities.add<Components>(entity);
     });
-    return id;
+    return id as any;
   }
 
   private getEntityId(): entity.EntityId {

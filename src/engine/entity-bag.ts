@@ -63,7 +63,9 @@ export class EntityBag<
     }
   }
 
-  add(entity: entity.AnyEntityComponents<Registry, keyof Registry>) {
+  add<Components extends keyof Registry>(
+    entity: entity.AnyEntityComponents<Registry, Components>
+  ) {
     for (const tag in this.tags) {
       const components = Object.keys(entity);
       let skip = false;

@@ -1,4 +1,5 @@
 import { Component } from "../engine/entity";
+import * as ecs from "../index";
 
 export type Clock = Component<{
   deltaMs: number;
@@ -22,3 +23,12 @@ export type Camera = Component<{
 }>;
 
 export type Circle2d = Component<{ radius: number }>;
+
+export type Line2d = Component<{
+  startRadian: number;
+  startMagnitude: number;
+  endRadian: number;
+  endMagnitude: number;
+  end: ecs.engine.entity.Reference<{ point: Point }, "point">;
+  start: ecs.engine.entity.Reference<{ point: Point }, "point">;
+}>;
