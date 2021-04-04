@@ -41,6 +41,19 @@ export class EntityBag<
     return this.states[tag][entity.id];
   }
 
+  byId<Tag extends keyof Tags>(
+    tag: Tag,
+    id: entity.Reference<Registry, Tags[Tag]>
+  ): entity.EntityComponents<Registry, Tags[Tag]> | undefined {
+    const entities = this.entities[tag as any];
+    if (!entities) {
+      return;
+    }
+    return entities.find((e) => {
+      return e.id === id;
+    }) as any;
+  }
+
   byTag<Tag extends keyof Tags>(
     tag: Tag
   ): readonly entity.EntityComponents<Registry, Tags[Tag]>[] {

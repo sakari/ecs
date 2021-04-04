@@ -30,6 +30,18 @@ describe("EntityBag", () => {
       expect(bag.getState("other", someEntity)).toEqual("state");
     });
   });
+  describe("byId", () => {
+    it("allows only existing tags", () => {
+      const bag = givenABag();
+      const someEntity = {
+        id: "1" as entity.EntityId,
+        some: { some: 1 },
+      };
+      bag.add(someEntity);
+      expect(bag.byId("other", someEntity.id as any)).toEqual(someEntity);
+    });
+  });
+
   describe("byTag", () => {
     it("allows only existing tags", () => {
       const bag = givenABag();

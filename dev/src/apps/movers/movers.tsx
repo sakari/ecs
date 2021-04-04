@@ -8,6 +8,7 @@ import * as setup from '../setup';
 type Registry = {
   speed: ecs.components.Speed2d;
   circle: ecs.components.Circle2d;
+  line: ecs.components.Line2d;
 } & setup.Registry
 
 function createCircle() {
