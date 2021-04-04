@@ -29,9 +29,14 @@ function createCircle() {
 
 function createEngine() {
   const svgDraw = ecs.systems.svgDraw.svgDraw<Registry>();
+  const canvasDraw = ecs.systems.canvasDraw.canvasDraw<Registry>();
   const mover = ecs.systems.move2d.move<Registry>();
   const flutterer = flutter.flutter<Registry>();
-  const engine = new ecs.engine.engine.Engine<Registry>([flutterer.system, svgDraw.system, mover.system]);
+  const engine = new ecs.engine.engine.Engine<Registry>([
+    flutterer.system,
+    canvasDraw.system,
+    mover.system
+  ]);
   const clock = engine.addEntity({
     clock: { deltaMs: 0 }
   })
@@ -57,7 +62,7 @@ function createEngine() {
       window.requestAnimationFrame(step);
     }
   };
-  for(let i = 0; i < 2000; i++) {
+  for(let i = 0; i < 10_000; i++) {
     engine.addEntity(createCircle());
   }
   engine.addEntity({
@@ -71,7 +76,7 @@ function createEngine() {
       tag: 'main'
     }
   });
-  return { svgDraw, engine, run: toggle };
+  return { draw: canvasDraw, engine, run: toggle };
 }
 
 function App() {
@@ -79,7 +84,7 @@ function App() {
   return (
     <div className="App">
       <button onClick={() => { window.requestAnimationFrame(state.run)}}>run</button>
-      <ViewPort setContainer={state.svgDraw.setContainer}></ViewPort>
+      <ViewPort setContainer={state.draw.setContainer}></ViewPort>
     </div>
   );
 }
