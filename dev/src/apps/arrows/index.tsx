@@ -21,7 +21,10 @@ function createCircle(x: number, y: number, radius: number) {
 }
 
 function createEngine() {
-  const canvasDraw = ecs.systems.canvasDraw.canvasDraw<Registry>();
+  const canvasDraw = ecs.systems.canvasDraw.canvasDraw<Registry>({ events: (e) => {
+      console.log(e);
+    }
+  });
   const engine = new ecs.engine.engine.Engine<Registry>([
     canvasDraw.system,
   ]);

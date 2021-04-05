@@ -12,7 +12,55 @@ export type Registry = {
 type Release = () => void;
 export type SetContainer = (tag: string, ref: HTMLElement) => Release;
 
-export function canvasDraw<R extends Registry>(): {
+interface MouseEvent {
+  down: boolean;
+  x: number;
+  y: number;
+}
+
+function trackInteractionEvents(
+  element: HTMLElement,
+  offsets: { x?: number; y?: number },
+  events: (event: MouseEvent) => void
+) {
+  let down = false;
+  element.onmousemove = (event) => {
+    if (offsets.x == null || offsets.y == null) {
+      return;
+    }
+    events({
+      down,
+      x: event.offsetX + offsets.x,
+      y: event.offsetY + offsets.y,
+    });
+  };
+  element.onmousedown = (event) => {
+    if (offsets.x == null || offsets.y == null) {
+      return;
+    }
+    down = true;
+    events({
+      down,
+      x: event.offsetX + offsets.x,
+      y: event.offsetY + offsets.y,
+    });
+  };
+  element.onmouseup = (event) => {
+    if (offsets.x == null || offsets.y == null) {
+      return;
+    }
+    down = false;
+    events({
+      down,
+      x: event.offsetX + offsets.x,
+      y: event.offsetY + offsets.y,
+    });
+  };
+}
+
+export function canvasDraw<R extends Registry>(opts?: {
+  events?: (event: MouseEvent) => void;
+}): {
   system: engine.entity.System<
     R,
     {
@@ -25,13 +73,19 @@ export function canvasDraw<R extends Registry>(): {
   setContainer: SetContainer;
 } {
   const canvases: Record<string, HTMLCanvasElement> = {};
+  const worldOffsets: { x?: number; y?: number } = {};
   return {
     setContainer: (tag, viewPort) => {
       const canvas = document.createElement("canvas");
       canvases[tag] = canvas;
       viewPort.innerHTML = "";
       viewPort.appendChild(canvas);
+      if (opts?.events) {
+        trackInteractionEvents(canvas, worldOffsets, opts.events);
+      }
       return () => {
+        delete worldOffsets.x;
+        delete worldOffsets.y;
         delete canvases[tag];
         viewPort.innerHTML = "";
       };
@@ -58,6 +112,10 @@ export function canvasDraw<R extends Registry>(): {
         ctx2d.clearRect(0, 0, camera.camera.width, camera.camera.height);
         const offsetX = -camera.point.x + camera.camera.width / 2;
         const offsetY = -camera.point.y + camera.camera.height / 2;
+
+        worldOffsets.x = camera.point.x - camera.camera.width / 2;
+        worldOffsets.y = camera.point.y - camera.camera.height / 2;
+
         for (const circle of entities.byTag("circle")) {
           const cx = circle.point.x + offsetX;
           const cy = circle.point.y + offsetY;
