@@ -60,6 +60,7 @@ function createEngine() {
     interactor.system,
     mouseInteraction.system
   ]);
+  let mouseDown = false;
   const { run } = setup.runner(engine, {
     preStart: () => {
       running = true;
@@ -69,10 +70,17 @@ function createEngine() {
       running = false;
     },
     preStep: () => {
-      engine.set(mouse, "mouse", { events: mouseEvents });
-      if (mouseEvents) {
-        mouseEvents = { ...mouseEvents, press: false, release: false }
+      if (!mouseEvents) {
+        return;
       }
+      const m = { events: {
+          ...mouseEvents,
+          press: !mouseDown && mouseEvents.down,
+          release: mouseDown && !mouseEvents.down
+        }
+      }
+      engine.set(mouse, "mouse", m);
+      mouseDown = mouseEvents.down;
     }
   });
   const mouse = engine.addEntity({ mouse: { events: null }})
