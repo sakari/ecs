@@ -4,6 +4,7 @@ import * as ecs from '@sakari/ecs';
 import ViewPort from '../../ViewPort';
 import * as setup from '../setup';
 import * as interact from '../movers/interact';
+import * as drag from '../movers/drag';
 
 type Registry = {
   circle: ecs.components.Circle2d;
@@ -27,7 +28,9 @@ function createCircle(x: number, y: number, radius: number) {
       lineColor: "black"
     },
     mouseInteraction: {
-      type: 'none' as const
+      type: 'none' as const,
+      x: 0,
+      y: 0
     }
   }
 }
@@ -42,11 +45,13 @@ function createEngine() {
     }
   });
   const mouseInteraction = ecs.systems.mouseInteraction.mouseInteraction<Registry>();
+  const dragger = drag.drag<Registry>();
   const interactor = interact.interact<Registry>();
   const engine = new ecs.engine.engine.Engine<Registry>([
     canvasDraw.system,
     mouseInteraction.system,
-    interactor.system
+    interactor.system,
+    dragger.system
   ]);
   const { run } = setup.runner(engine, {
     preStart: () => {

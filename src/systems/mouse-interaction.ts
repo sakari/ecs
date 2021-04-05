@@ -33,7 +33,11 @@ export function mouseInteraction<R extends Registry>(): {
             }
             if (shape.mouseInteraction.type === "press") {
               if (lastEvent.down === false) {
-                actions.set(shape, "mouseInteraction", { type: "release" });
+                actions.set(shape, "mouseInteraction", {
+                  type: "release",
+                  x: lastEvent.x - shape.point.x,
+                  y: lastEvent.y - shape.point.y,
+                });
               }
               continue;
             }
@@ -44,14 +48,26 @@ export function mouseInteraction<R extends Registry>(): {
               ) < shape.circle.radius
             ) {
               if (lastEvent.press) {
-                actions.set(shape, "mouseInteraction", { type: "press" });
+                actions.set(shape, "mouseInteraction", {
+                  type: "press",
+                  x: lastEvent.x - shape.point.x,
+                  y: lastEvent.y - shape.point.y,
+                });
               } else {
-                actions.set(shape, "mouseInteraction", { type: "hover" });
+                actions.set(shape, "mouseInteraction", {
+                  type: "hover",
+                  x: lastEvent.x - shape.point.x,
+                  y: lastEvent.y - shape.point.y,
+                });
               }
               continue;
             }
             if (shape.mouseInteraction.type !== "none") {
-              actions.set(shape, "mouseInteraction", { type: "none" });
+              actions.set(shape, "mouseInteraction", {
+                type: "none",
+                x: 0,
+                y: 0,
+              });
             }
           }
         }

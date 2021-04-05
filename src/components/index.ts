@@ -20,6 +20,8 @@ export interface MouseEvent {
 
 export type MouseInteract = Component<{
   type: "hover" | "press" | "release" | "none";
+  x: number;
+  y: number;
 }>;
 
 export type Mouse = Component<{ events: MouseEvent | null }>;

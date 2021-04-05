@@ -33,7 +33,9 @@ function createCircle() {
       radius: 20
     },
     mouseInteraction: {
-      type: 'none' as const
+      type: 'none' as const,
+      x: 0,
+      y: 0
     }
   }
 }
