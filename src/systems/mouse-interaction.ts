@@ -5,14 +5,14 @@ export type Registry = {
   circle: components.Circle2d;
   point: components.Point;
   mouse: components.Mouse;
-  hover: components.MouseHover;
+  mouseInteraction: components.MouseInteract;
 };
 
 export function mouseInteraction<R extends Registry>(): {
   system: engine.entity.System<
     R,
     {
-      circle: "circle" | "point" | "hover";
+      circle: "circle" | "point" | "mouseInteraction";
       mouse: "mouse";
     }
   >;
@@ -20,15 +20,21 @@ export function mouseInteraction<R extends Registry>(): {
   return {
     system: {
       componentSelector: {
-        circle: new Set(["circle", "point", "hover"]),
+        circle: new Set(["circle", "point", "mouseInteraction"]),
         mouse: new Set(["mouse"]),
       },
       run: (actions, entities) => {
         const circles = entities.byTag("circle");
         for (const mouse of entities.byTag("mouse")) {
+          const lastEvent = mouse.mouse.events;
           for (const shape of circles) {
-            const lastEvent = mouse.mouse.events;
             if (!lastEvent) {
+              continue;
+            }
+            if (shape.mouseInteraction.type === "press") {
+              if (lastEvent.down === false) {
+                actions.set(shape, "mouseInteraction", { type: "release" });
+              }
               continue;
             }
             if (
@@ -37,11 +43,15 @@ export function mouseInteraction<R extends Registry>(): {
                   Math.pow(shape.point.y - lastEvent.y, 2)
               ) < shape.circle.radius
             ) {
-              if (!shape.hover.hovering) {
-                actions.set(shape, "hover", { hovering: true });
+              if (lastEvent.press) {
+                actions.set(shape, "mouseInteraction", { type: "press" });
+              } else {
+                actions.set(shape, "mouseInteraction", { type: "hover" });
               }
-            } else if (shape.hover.hovering) {
-              actions.set(shape, "hover", { hovering: false });
+              continue;
+            }
+            if (shape.mouseInteraction.type !== "none") {
+              actions.set(shape, "mouseInteraction", { type: "none" });
             }
           }
         }

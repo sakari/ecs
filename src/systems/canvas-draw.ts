@@ -12,16 +12,10 @@ export type Registry = {
 type Release = () => void;
 export type SetContainer = (tag: string, ref: HTMLElement) => Release;
 
-interface MouseEvent {
-  down: boolean;
-  x: number;
-  y: number;
-}
-
 function trackInteractionEvents(
   element: HTMLElement,
   offsets: { x?: number; y?: number },
-  events: (event: MouseEvent) => void
+  events: (event: components.MouseEvent) => void
 ) {
   let down = false;
   element.onmousemove = (event) => {
@@ -29,6 +23,8 @@ function trackInteractionEvents(
       return;
     }
     events({
+      release: false,
+      press: false,
       down,
       x: event.offsetX + offsets.x,
       y: event.offsetY + offsets.y,
@@ -40,6 +36,8 @@ function trackInteractionEvents(
     }
     down = true;
     events({
+      release: false,
+      press: true,
       down,
       x: event.offsetX + offsets.x,
       y: event.offsetY + offsets.y,
@@ -51,6 +49,8 @@ function trackInteractionEvents(
     }
     down = false;
     events({
+      release: true,
+      press: false,
       down,
       x: event.offsetX + offsets.x,
       y: event.offsetY + offsets.y,
@@ -59,7 +59,7 @@ function trackInteractionEvents(
 }
 
 export function canvasDraw<R extends Registry>(opts?: {
-  events?: (event: MouseEvent) => void;
+  events?: (event: components.MouseEvent) => void;
 }): {
   system: engine.entity.System<
     R,

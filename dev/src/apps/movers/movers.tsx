@@ -12,7 +12,7 @@ type Registry = {
   drawStyle: ecs.components.DrawStyle;
   line: ecs.components.Line2d;
   mouse: ecs.components.Mouse;
-  hover: ecs.components.MouseHover;
+  mouseInteraction: ecs.components.MouseInteract;
 } & setup.Registry
 
 function createCircle() {
@@ -32,8 +32,8 @@ function createCircle() {
     circle: {
       radius: 20
     },
-    hover: {
-      hovering: false
+    mouseInteraction: {
+      type: 'none' as const
     }
   }
 }
@@ -68,6 +68,9 @@ function createEngine() {
     },
     preStep: () => {
       engine.set(mouse, "mouse", { events: mouseEvents });
+      if (mouseEvents) {
+        mouseEvents = { ...mouseEvents, press: false, release: false }
+      }
     }
   });
   const mouse = engine.addEntity({ mouse: { events: null }})

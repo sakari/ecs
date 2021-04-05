@@ -11,14 +11,17 @@ export type Speed2d = Component<{
 }>;
 
 export interface MouseEvent {
+  press: boolean;
+  release: boolean;
   down: boolean;
   x: number;
   y: number;
 }
 
-export type MouseHover = Component<{
-  hovering: boolean;
+export type MouseInteract = Component<{
+  type: "hover" | "press" | "release" | "none";
 }>;
+
 export type Mouse = Component<{ events: MouseEvent | null }>;
 
 export type Point = Component<{
