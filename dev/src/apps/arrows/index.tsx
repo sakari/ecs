@@ -7,6 +7,7 @@ import * as setup from '../setup';
 type Registry = {
   circle: ecs.components.Circle2d;
   line: ecs.components.Line2d;
+  drawStyle: ecs.components.DrawStyle;
 } & setup.Registry
 
 function createCircle(x: number, y: number, radius: number) {
@@ -16,6 +17,11 @@ function createCircle(x: number, y: number, radius: number) {
     },
     circle: {
       radius
+    },
+    drawStyle: {
+      fillColor: "blue",
+      lineWidth: 2,
+      lineColor: "black"
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Component } from "../engine/entity";
+import { Component, Reference } from "../engine/entity";
 import * as ecs from "../index";
 
 export type Clock = Component<{
@@ -9,6 +9,17 @@ export type Speed2d = Component<{
   dxMs: number;
   dyMs: number;
 }>;
+
+export interface MouseEvent {
+  down: boolean;
+  x: number;
+  y: number;
+}
+
+export type MouseHover = Component<{
+  hovering: boolean;
+}>;
+export type Mouse = Component<{ events: MouseEvent | null }>;
 
 export type Point = Component<{
   x: number;
@@ -23,6 +34,12 @@ export type Camera = Component<{
 }>;
 
 export type Circle2d = Component<{ radius: number }>;
+
+export type DrawStyle = Component<{
+  fillColor: null | string;
+  lineColor: null | string;
+  lineWidth: null | number;
+}>;
 
 export type Line2d = Component<{
   startRadian: number;

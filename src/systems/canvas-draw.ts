@@ -1,11 +1,11 @@
 import * as engine from "../engine";
 import * as components from "../components";
-import { start } from "repl";
 
 export type Registry = {
   camera: components.Camera;
   point: components.Point;
   circle: components.Circle2d;
+  drawStyle: components.DrawStyle;
   line: components.Line2d;
 };
 
@@ -65,7 +65,7 @@ export function canvasDraw<R extends Registry>(opts?: {
     R,
     {
       camera: "camera" | "point";
-      circle: "circle" | "point";
+      circle: "circle" | "point" | "drawStyle";
       lines: "line";
       points: "point";
     }
@@ -93,7 +93,7 @@ export function canvasDraw<R extends Registry>(opts?: {
     system: {
       componentSelector: {
         camera: new Set(["camera", "point"]),
-        circle: new Set(["circle", "point"]),
+        circle: new Set(["circle", "point", "drawStyle"]),
         lines: new Set(["line"]),
         points: new Set(["point"]),
       },
@@ -121,12 +121,16 @@ export function canvasDraw<R extends Registry>(opts?: {
           const cy = circle.point.y + offsetY;
           ctx2d.beginPath();
           ctx2d.arc(cx, cy, circle.circle.radius, 0, 2 * Math.PI);
-          ctx2d.fillStyle = "red";
-          ctx2d.fill();
+          if (circle.drawStyle.fillColor) {
+            ctx2d.fillStyle = circle.drawStyle.fillColor;
+            ctx2d.fill();
+          }
           ctx2d.beginPath();
           ctx2d.arc(cx, cy, circle.circle.radius, 0, 2 * Math.PI);
-          ctx2d.lineWidth = 2;
-          ctx2d.strokeStyle = "black";
+          if (circle.drawStyle.lineColor && circle.drawStyle.lineWidth) {
+            ctx2d.lineWidth = circle.drawStyle.lineWidth;
+            ctx2d.strokeStyle = circle.drawStyle.lineColor;
+          }
           ctx2d.stroke();
         }
         for (const line of entities.byTag("lines")) {

@@ -6,7 +6,11 @@ export type Registry = {
   clock: ecs.components.Clock;
 }
 
-export function runner(engine: ecs.engine.engine.Engine<Registry>) {
+export function runner(engine: ecs.engine.engine.Engine<Registry>, opts?: {
+  preStep: () => void;
+  postStop: () => void;
+  preStart: () => void;
+}) {
   const clock = engine.addEntity({
     clock: { deltaMs: 0 }
   })
@@ -16,9 +20,11 @@ export function runner(engine: ecs.engine.engine.Engine<Registry>) {
   function toggle() {
     if (running) {
       running = false;
+      opts?.postStop();
     } else {
       running = true;
       start = null;
+      opts?.preStart();
       window.requestAnimationFrame(step)
     }
   }
@@ -27,6 +33,7 @@ export function runner(engine: ecs.engine.engine.Engine<Registry>) {
     const deltaMs = start === null ? 0 : time - start;
     start = time;
     engine.set(clock, 'clock', { deltaMs });
+    opts?.preStep();
     engine.step();
     if (running) {
       window.requestAnimationFrame(step);
